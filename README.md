@@ -26,6 +26,7 @@ $ for_each_arch file /bin/true
 > Oh that is neat. But I could also just have spun up 3 full-system QEMUs and installed 3 Linux distros.
 
 True, but:
+
    0. This takes care of all the setup. With these scripts, moving to other {arch, debian version} is super easy.
    1. It would run slower since you now emulate peripherals and another Linux kernel. BTW, which boards would you pick?
    2. This runs under the same Linux kernel so the different programs under each architectures can interact normally; named pipes, even shared memory and IPC. 
