@@ -45,3 +45,10 @@ There is just one caveat: For now, Docker `--privileged` is required as binfmt m
 OK but this is my personal one, https://hub.docker.com/r/mpedoticon/debian_foreign/ .
 Disclaimer: Not production ready! I may change this image into a banana if I feel like it.
 
+## How to
+
+Currently you do need this git cheked out first.
+Steps to run:
+  1. Git clone this.
+  2. Read through what `payload.sh` does, before you run it under a privileged Docker :)
+  3. Run: `sudo docker run --privileged -v ${PWD}:/this_dir -it  mpedoticon/debian_foreign bash -x /this_dir/payload.sh`
