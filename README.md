@@ -31,9 +31,13 @@ True, but:
    1. It would run slower since you now emulate peripherals and another Linux kernel. BTW, which boards would you pick?
    2. This runs under the same Linux kernel so the different programs under each architectures can interact normally; named pipes, even shared memory and IPC. 
 
-> Cool!
+> Cool! This would be great for automated {build, run-time} testing of various Linux software following a {git clone, configure, make, test}-pattern.
 
-Yes.
+Yes! And when running, one could use gdb with `rbreak`, `info variables` and `commands` to dump scalar variables to a log. Diffing the logs between MIPS and MIPSel (with suitable magic) would reveal endianess bugs encountered. This forms the idea for an empirical endianess-bug detector.
+
+
+# Caveats
+
 There is just one caveat: For now, Docker `--privileged` is required as binfmt must be mounted. There are ways around this though by patching QEMU user mode itself.
 
 
