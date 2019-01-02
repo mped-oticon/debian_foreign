@@ -4,14 +4,11 @@
 
 function for_each_arch
 {
-    arches=(arm64 mips mipsel)
+    #arches=(arm64 mips mipsel)
+    arches=(mips)
     for arch in ${arches[@]} ; do
         schroot --directory / -c ${arch}-stretch -- $@
     done
 }
 
-# Payload
-for_each_arch uname -a
-for_each_arch apt-get update
-for_each_arch apt-get install -y file
-for_each_arch file /bin/true
+for_each_arch $@

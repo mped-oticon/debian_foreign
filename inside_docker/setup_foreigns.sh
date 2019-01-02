@@ -1,11 +1,16 @@
 #!/bin/bash
 # Author: Mark Ruvald Pedersen (MPED)
-# Description: This script installs foreign-arch Debian userland(s)
+# Description: This script installs foreign-arch Debian userland(s). Runs inside docker
 
 
-# Tunables
-VDEBIAN="stretch"          # Debian release running in the emulated architecture
-PREFIX="/scratch"          # Docker-prefix for the rootfs of the emulated debian
+### Tunables
+
+# Debian release running in the emulated architecture
+VDEBIAN="stretch"
+
+# Docker-prefix for the rootfs of the emulated debian
+PREFIX="/chroots"
+
 
 function install_foreign_userland
 {
@@ -53,9 +58,9 @@ users=$(whoami)
 type=directory" | tee /etc/schroot/chroot.d/${VNAME}
 
     # Add fstab entry to the guest-chroots, if not added already
-    grep -q /host_rootfs /etc/schroot/default/fstab || {
+    grep -q /docker_root /etc/schroot/default/fstab || {
         # Forward whole Host's root file system to be visible by every guest
-        echo "/ /host_rootfs none rw,bind 0 0"  >> /etc/schroot/default/fstab
+        echo "/ /docker_root none rw,rbind 0 0"  >> /etc/schroot/default/fstab
     }
 
     # Enter the emulated and chrooted userland, to finalize the userland setup
@@ -63,6 +68,6 @@ type=directory" | tee /etc/schroot/chroot.d/${VNAME}
 }
 
 # One-time: debootstrap
-install_foreign_userland arm64  aarch64
+# install_foreign_userland arm64  aarch64
 install_foreign_userland mips   mips
-install_foreign_userland mipsel mipsel
+# install_foreign_userland mipsel mipsel
