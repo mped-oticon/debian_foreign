@@ -23,9 +23,9 @@ EOF
 apt-get update
 
 apt-get -t testing install -y make cmake ninja-build
-apt-get -t testing install -y gcc g++ build-essential
+apt-get -t testing install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" gcc g++ build-essential
 apt-get -t testing install -y gperf gdb
 apt-get -t testing install -y device-tree-compiler
-apt-get install -y --no-install-recommends git dfu-util less strace vim wget python3-pip python3-setuptools python3-wheel xz-utils file
+apt-get install -y --no-install-recommends git file dfu-util less strace vim wget net-tools python3-pip python3-setuptools python3-wheel xz-utils
 
 bash -x /docker_root/this_dir/inside_docker/inside_chroots/install_gcc_wrapper.sh

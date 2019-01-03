@@ -34,7 +34,7 @@ function install_foreign_userland
     #   qemu-user-static: Statically-linked QEMUs, i.e. without further dependencies
     #   schroot: A batter chroot. Bind mounts /proc /dev /dev/pts and /sys automatically
     apt-get update
-    apt-get install -y debootstrap qemu-user-static schroot
+    apt-get install -y debootstrap qemu-user-static schroot gdb-multiarch
 
     # Install a 1st stage Debian userland of a foreign architecture
     (cd / && debootstrap --arch ${VARCH} --foreign --variant=minbase ${VDEBIAN} ${VROOTFS})

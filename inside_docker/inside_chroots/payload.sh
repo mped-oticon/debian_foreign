@@ -21,7 +21,6 @@ function build_zephyr
             # Some hacks are required
             git clone -b master-nativeposix_mips https://github.com/mped-oticon/zephyr
 
-            # TODO: Installing these pip packages breaks apt-get update!
             pip3 install --user -r zephyr/scripts/requirements.txt
         }
 

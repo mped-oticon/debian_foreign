@@ -11,11 +11,16 @@ function gccwrap
     do
         local ith_arg="${parms[$i]}"
         case "$ith_arg" in
-            -m32)    unset parms[$i] ;;
+            -m32)                               unset parms[$i] ;;
+            -fno-asynchronous-unwind-tables)    unset parms[$i] ;;
+            "-D_FORTIFY_SOURCE=2")              unset parms[$i] ;;
         esac
     done
 
-    set -- "${parms[@]}"
+    # Statically compile + enable debug to permit GDB symbol resolution
+    set -- "-g -ggdb -static ${parms[@]}"
+
+    echo "(cd $PWD && /usr/bin/g++.real $@)"
     exec /usr/bin/g++.real $@
 }
 
