@@ -1,0 +1,100 @@
+
+eisbaw@kbnuxfrm033:/scratch/debian_foreign$ time ./build_docker_image.sh --interactive
+root@64b8908161e5:/# arch=mips
+root@64b8908161e5:/# schroot --directory / -c ${arch}-stretch -- bash
+
+
+
+
+
+root@64b8908161e5:/# schroot --directory / -c ${arch}-stretch -- qemu-mips-static -g 6789 /root/zephyr/samples/hello_world/build/zephyr/zephyr.elf &
+
+root@64b8908161e5:/# gdb-multiarch -q /chroots/mips-stretch/root/zephyr/samples/hello_world/build/zephyr/zephyr.elf
+(gdb) set arch mips
+(gdb) set endian big
+(gdb) target remote localhost:6789
+(gdb) c
+Continuing.
+***** Booting Zephyr OS v1.12.0-4799-gf11b3e1021 *****
+Hello World! native_posix
+^C
+
+
+
+
+function run_under_gdb
+{
+    local ZEPHYR_ELF=/root/zephyr/samples/hello_world/build/zephyr/zephyr.elf
+    local VROOTFS=/chroots/mips-stretch
+    local GDB_PORT=6789
+
+    cd /chroots/mips-stretch && (
+        schroot --directory / -c ${arch}-stretch -- qemu-${arch}-static -g ${GDB_PORT} "${ZEPHYR_ELF}" &
+
+        gdb-multiarch \
+        -q \
+        -ex "layout split" \
+        -ex "focus cmd" \
+        -ex "set arch ${arch}" \
+        -ex "set endian big" \
+        -ex "target remote localhost:${GDB_PORT}" \
+        "${VROOTFS}/${ZEPHYR_ELF}"
+    )
+}
+
+(gdb) bt
+#0  _Cstart () at /root/zephyr/kernel/init.c:479
+#1  0x00401c9c in zephyr_wrapper (a=<optimized out>) at /root/zephyr/soc/posix/inf_clock/soc.c:189
+#2  0x00407a58 in start_thread (arg=0x76fffb9c) at pthread_create.c:486
+#3  0x004417b4 in __thread_start ()
+
+
+root@6b803b2734b6:/chroots/mips-stretch# grep -C10 -ERn "Hello World" root/zephyr/samples/hello_world/src/main.c
+2- * Copyright (c) 2012-2014 Wind River Systems, Inc.
+3- *
+4- * SPDX-License-Identifier: Apache-2.0
+5- */
+6-
+7-#include <zephyr.h>
+8-#include <misc/printk.h>
+9-
+10-void main(void)
+11-{
+12:     printk("Hello World! %s\n", CONFIG_BOARD);
+13-}
+
+
+(gdb) info threads
+(gdb) b printk
+(gdb) thread 2
+(gdb) bt
+#0  printk (fmt=0x47b650 "***** Booting Zephyr OS v1.12.0-4799-gf11b3e1021 *****\n") at /root/zephyr/misc/printk.c:335
+#1  0x004043b4 in bg_thread_main (unused1=<optimized out>, unused2=<optimized out>, unused3=<optimized out>) at /root/zephyr/kernel/init.c:225
+#2  0x00400690 in _thread_entry (entry=<optimized out>, p1=<optimized out>, p2=<optimized out>, p3=<optimized out>) at /root/zephyr/lib/thread_entry.c:29
+#3  0x00401440 in posix_thread_starter (arg=0x4a8de8 <_main_stack+1000>) at /root/zephyr/arch/posix/core/posix_core.c:301
+#4  0x00407a58 in start_thread (arg=0x767fdcb4) at pthread_create.c:486
+#5  0x004417b4 in __thread_start ()
+
+
+
+
+
+
+
+
+
+----
+
+
+
++ exec /usr/bin/gcc.real -ggdb3 -DBUILD_VERSION=v1.12.0-4799-gf11b3e1021 -DKERNEL -D_FORTIFY_SOURCE=2 -D_POSIX_C_SOURCE=200809 -D_XOPEN_SOURCE=600 -D_XOPEN_SOURCE_EXTENDED -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -I../../../kernel/include -I../../../arch/posix/include -I../../../soc/posix/inf_clock -I../../../soc/posix/inf_clock/include -I../../../soc/posix/include -I../../../include -I../../../include/drivers -Izephyr/include/generated -I../../../boards/posix/native_posix -Os -g -Wall -Wformat -Wformat-security -Wno-format-zero-length -imacros /root/zephyr/samples/hello_world/build/zephyr/include/generated/autoconf.h -ffreestanding -Wno-main -fno-common -fno-asynchronous-unwind-tables -fno-strict-overflow -Wno-pointer-sign -Wno-unused-but-set-variable -fno-reorder-functions -fno-defer-pop -Werror=implicit-int -Wpointer-arith -ffunction-sections -fdata-sections -fno-freestanding -MMD -MP -include /root/zephyr/arch/posix/include/posix_cheats.h -std=c11 -MD -MT zephyr/kernel/CMakeFiles/kernel.dir/sched.c.obj -MF zephyr/kernel/CMakeFiles/kernel.dir/sched.c.obj.d -o zephyr/kernel/CMakeFiles/kernel.dir/sched.c.obj -c /root/zephyr/kernel/sched.c
+[70/72] Building C object zephyr/kernel/CMakeFiles/kernel.dir/timeout.c.obj
++ exec /usr/bin/gcc.real -ggdb3 -DBUILD_VERSION=v1.12.0-4799-gf11b3e1021 -DKERNEL -D_FORTIFY_SOURCE=2 -D_POSIX_C_SOURCE=200809 -D_XOPEN_SOURCE=600 -D_XOPEN_SOURCE_EXTENDED -D__ZEPHYR_SUPERVISOR__ -D__ZEPHYR__=1 -I../../../kernel/include -I../../../arch/posix/include -I../../../soc/posix/inf_clock -I../../../soc/posix/inf_clock/include -I../../../soc/posix/include -I../../../include -I../../../include/drivers -Izephyr/include/generated -I../../../boards/posix/native_posix -Os -g -Wall -Wformat -Wformat-security -Wno-format-zero-length -imacros /root/zephyr/samples/hello_world/build/zephyr/include/generated/autoconf.h -ffreestanding -Wno-main -fno-common -fno-asynchronous-unwind-tables -fno-strict-overflow -Wno-pointer-sign -Wno-unused-but-set-variable -fno-reorder-functions -fno-defer-pop -Werror=implicit-int -Wpointer-arith -ffunction-sections -fdata-sections -fno-freestanding -MMD -MP -include /root/zephyr/arch/posix/include/posix_cheats.h -std=c11 -MD -MT zephyr/kernel/CMakeFiles/kernel.dir/timeout.c.obj -MF zephyr/kernel/CMakeFiles/kernel.dir/timeout.c.obj.d -o zephyr/kernel/CMakeFiles/kernel.dir/timeout.c.obj -c /root/zephyr/kernel/timeout.c
+[72/72] Linking C executable zephyr/zephyr.elf
+FAILED: zephyr/zephyr.elf
+: && /usr/bin/gcc -m32   zephyr/CMakeFiles/zephyr_prebuilt.dir/misc/empty_file.c.obj  -o zephyr/zephyr.elf  -T zephyr/linker.cmd -Wl,-Map=/root/zephyr/samples/hello_world/build/zephyr/zephyr.map -u_OffsetAbsSyms -u_ConfigAbsSyms -Wl,--whole-archive app/libapp.a zephyr/libzephyr.a zephyr/arch/posix/core/libarch__posix__core.a zephyr/soc/posix/inf_clock/libsoc__posix__inf_clock.a zephyr/boards/posix/native_posix/libboards__posix__native_posix.a -Wl,--no-whole-archive zephyr/kernel/libkernel.a zephyr/CMakeFiles/offsets.dir/arch/posix/core/offsets/offsets.c.obj -L/root/zephyr/samples/hello_world/build/zephyr -Wl,--gc-sections -Wl,--build-id=none -ldl -pthread -m32 -lm && cd /root/zephyr/samples/hello_world/build/zephyr && /usr/bin/python3 /root/zephyr/scripts/check_link_map.py zephyr.map && /usr/bin/objdump -S zephyr.elf > zephyr.lst && /usr/bin/readelf -e zephyr.elf > zephyr.stat && /usr/bin/cmake -E copy zephyr.elf zephyr.exe
++ exec /usr/bin/gcc.real -ggdb3 zephyr/CMakeFiles/zephyr_prebuilt.dir/misc/empty_file.c.obj -o zephyr/zephyr.elf -T zephyr/linker.cmd -Wl,-Map=/root/zephyr/samples/hello_world/build/zephyr/zephyr.map -u_OffsetAbsSyms -u_ConfigAbsSyms -Wl,--whole-archive app/libapp.a zephyr/libzephyr.a zephyr/arch/posix/core/libarch__posix__core.a zephyr/soc/posix/inf_clock/libsoc__posix__inf_clock.a zephyr/boards/posix/native_posix/libboards__posix__native_posix.a -Wl,--no-whole-archive zephyr/kernel/libkernel.a zephyr/CMakeFiles/offsets.dir/arch/posix/core/offsets/offsets.c.obj -L/root/zephyr/samples/hello_world/build/zephyr -Wl,--gc-sections -Wl,--build-id=none -ldl -pthread -lm
+/usr/bin/ld:zephyr/linker.cmd:1: ignoring invalid character `#' in expression
+/usr/bin/ld:zephyr/linker.cmd:1: syntax error
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
