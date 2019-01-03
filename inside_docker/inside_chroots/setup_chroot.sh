@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Mark Ruvald Pedersen (MPED)
-# Description: This script sets up a chroot
+# Description: This script installs packages into a chroot.
 
 # Debug
 uname -a
@@ -22,6 +22,10 @@ EOF
 
 apt-get update
 
-apt-get install -y --no-install-recommends git ninja-build gperf ccache dfu-util device-tree-compiler wget python3-pip python3-setuptools python3-wheel xz-utils file make gcc gcc-multilib cmake build-essential
-#pip3 install scikit-build
-apt-get -t testing install -y cmake
+apt-get -t testing install -y make cmake ninja-build
+apt-get -t testing install -y gcc g++ build-essential
+apt-get -t testing install -y gperf gdb
+apt-get -t testing install -y device-tree-compiler
+apt-get install -y --no-install-recommends git dfu-util less strace vim wget python3-pip python3-setuptools python3-wheel xz-utils file
+
+bash -x /docker_root/this_dir/inside_docker/inside_chroots/install_gcc_wrapper.sh
