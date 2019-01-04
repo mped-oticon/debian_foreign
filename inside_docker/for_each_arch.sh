@@ -5,7 +5,7 @@
 function for_each_arch
 {
     #arches=(arm64 mips mipsel)
-    arches=(mips)
+    arches=(mips mipsel)
     for arch in ${arches[@]} ; do
         schroot --directory / -c ${arch}-stretch -- $@
     done

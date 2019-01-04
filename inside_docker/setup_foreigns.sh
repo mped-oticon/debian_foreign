@@ -70,4 +70,4 @@ type=directory" | tee /etc/schroot/chroot.d/${VNAME}
 # One-time: debootstrap
 # install_foreign_userland arm64  aarch64
 install_foreign_userland mips   mips
-# install_foreign_userland mipsel mipsel
+install_foreign_userland mipsel mipsel

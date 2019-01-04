@@ -3,6 +3,7 @@
 # Description: This script builds a docker image and optionally uploads it to Docker Hub
 # Please do not depend on my Docker Hub image, rather fork it yourself.
 # You want to have $DOCKER_ID_USER set correctly if you want to push to your own Docker Hub repo!
+# It takes around 30mins to complete --setup_foreigns --setup_chroots --push --fetch_all --build_all
 
 IMAGE_V0=debian:stretch-slim              # Input: Some small Debian [AMD64] (or other distro which has debootstrap)
 IMAGE_V1=debian_foreign_base              # Output: Debian [AMD64] containing other Debians of differing architectures via schroot
