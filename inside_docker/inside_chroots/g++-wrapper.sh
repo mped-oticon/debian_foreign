@@ -10,6 +10,8 @@ function gccwrap
     for (( i=(($num_params - 1)); i>=0; i-- ))
     do
         local ith_arg="${parms[$i]}"
+        # echo "$i : $ith_arg" 1>&2
+
         case "$ith_arg" in
             -m32)                               unset parms[$i] ;;
             -fno-asynchronous-unwind-tables)    unset parms[$i] ;;
@@ -18,13 +20,14 @@ function gccwrap
     done
 
     if [[ "$PWD" == *"/bsim/"* ]]; then
-        set -- "-g -ggdb ${parms[@]}"
+        prefix_params="-g -ggdb"
     fi
 
     if [[ "$PWD" == *"/zephyr/"* ]]; then
-        # Statically compile + enable debug to permit GDB symbol resolution
-        set -- "-g -ggdb -static ${parms[@]}"
+        prefix_params="-g -ggdb -static" # Statically compile + enable debug to permit GDB symbol resolution
     fi
+
+    set -- "${prefix_params} ${parms[@]}"
 
     echo "(cd $PWD && /usr/bin/g++.real $@)" 1>&2
     exec /usr/bin/g++.real $@
