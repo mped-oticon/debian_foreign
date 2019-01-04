@@ -17,10 +17,16 @@ function gccwrap
         esac
     done
 
-    # Statically compile + enable debug to permit GDB symbol resolution
-    set -- "-g -ggdb -static ${parms[@]}"
+    if [[ "$PWD" == *"/bsim/"* ]]; then
+        set -- "-g -ggdb ${parms[@]}"
+    fi
 
-    echo "(cd $PWD && /usr/bin/g++.real $@)"
+    if [[ "$PWD" == *"/zephyr/"* ]]; then
+        # Statically compile + enable debug to permit GDB symbol resolution
+        set -- "-g -ggdb -static ${parms[@]}"
+    fi
+
+    echo "(cd $PWD && /usr/bin/g++.real $@)" 1>&2
     exec /usr/bin/g++.real $@
 }
 

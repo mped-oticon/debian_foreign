@@ -4,10 +4,11 @@
 # Please do not depend on my Docker Hub image, rather fork it yourself.
 # You want to have $DOCKER_ID_USER set correctly if you want to push to your own Docker Hub repo!
 
-IMAGE_V0=debian:stretch-slim    # Input: Some small Debian [AMD64] (or other distro which has debootstrap)
-IMAGE_V1=debian_foreign_base    # Output: Debian [AMD64] containing other Debians of differing architectures via schroot
-IMAGE_V2=debian_foreign         # Output: Same as IMAGE_V1 with chroots being populated with packages
-IMAGE_V3=debian_foreign_payload # Output: Same as IMAGE_V2 with payload having been executed
+IMAGE_V0=debian:stretch-slim              # Input: Some small Debian [AMD64] (or other distro which has debootstrap)
+IMAGE_V1=debian_foreign_base              # Output: Debian [AMD64] containing other Debians of differing architectures via schroot
+IMAGE_V2=debian_foreign                   # Output: Same as IMAGE_V1 with chroots being populated with packages
+IMAGE_V3=debian_foreign_fetched           # Output: Same as IMAGE_V2 with zephyr having been fetched
+IMAGE_V4=debian_foreign_built             # Output: Same as IMAGE_V3 with zephyr having been built
 
 DOCKER_RUN_OPTS="--privileged -v ${PWD}:/this_dir -it"
 
@@ -40,7 +41,6 @@ fi
 
 ### Run: Under every architecture's chroot, install some packages
 if [[ "$@" == *"--setup_chroots"* ]]; then
-    # Run some payload
     sudo docker run                        \
         ${DOCKER_RUN_OPTS}                 \
         ${IMAGE_V1}                        \
@@ -60,17 +60,28 @@ if [[ "$@" == *"--push"* ]]; then
 fi
 
 
-### Run: Under every architecture's chroot, execute the payload
-if [[ "$@" == *"--payload"* ]]; then
-    # Run some payload
+### Run: Under every architecture's chroot, fetch zephyr
+if [[ "$@" == *"--fetch_all"* ]]; then
     sudo docker run                        \
         ${DOCKER_RUN_OPTS}                 \
         ${IMAGE_V2}                        \
-        bash -x /this_dir/inside_docker/for_each_arch.sh bash -x /docker_root/this_dir/inside_docker/inside_chroots/payload.sh
+        bash -x /this_dir/inside_docker/for_each_arch.sh bash -x /docker_root/this_dir/inside_docker/inside_chroots/zephyr.sh fetch_all
 
     # TODO: Test if payload executed correctly
 
     docker_commit ${IMAGE_V2} ${IMAGE_V3}
+fi
+
+### Run: Under every architecture's chroot, build zephyr
+if [[ "$@" == *"--build_all"* ]]; then
+    sudo docker run                        \
+        ${DOCKER_RUN_OPTS}                 \
+        ${IMAGE_V3}                        \
+        bash -x /this_dir/inside_docker/for_each_arch.sh bash -x /docker_root/this_dir/inside_docker/inside_chroots/zephyr.sh build_all
+
+    # TODO: Test if payload executed correctly
+
+    docker_commit ${IMAGE_V3} ${IMAGE_V4}
 fi
 
 
@@ -78,6 +89,6 @@ fi
 if [[ "$@" == *"--interactive"* ]]; then
     sudo docker run                        \
         ${DOCKER_RUN_OPTS}                 \
-        ${IMAGE_V3}                        \
+        ${IMAGE_V4}                        \
         bash
 fi

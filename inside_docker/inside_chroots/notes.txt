@@ -98,3 +98,131 @@ FAILED: zephyr/zephyr.elf
 /usr/bin/ld:zephyr/linker.cmd:1: syntax error
 collect2: error: ld returned 1 exit status
 ninja: build stopped: subcommand failed.
+
+
+
+-------------
+
+
+source debug_naughty.py
+
+rbreak ^print.*
+rbreak printk.c:.*
+
+thread apply all bt 1
+thread apply all bt 1 full
+
+
+
+
+python print(gdb.selected_thread())
+python print(InferiorThread.num)
+python print(InferiorThread.global_num)
+
+python print(gdb.newest_frame() == gdb.selected_frame())
+
+
+
+
+
+Type info variables to list "All global and static variable names".
+Type info locals    to list "Local variables of current stack frame" (names and values), including static variables in that function.
+Type info args      to list "Arguments of the current stack frame" (names and values).
+
+
+(gdb) help bt
+Print backtrace of all stack frames, or innermost COUNT frames.
+With a negative argument, print outermost -COUNT frames.
+Use of the 'full' qualifier also prints the values of the local variables.
+Use of the 'no-filters' qualifier prohibits frame filters from executing
+on this backtrace.
+
+--
+
+
+eisbaw@kbnuxfrm033:/scratch/debian_foreign$ ./build_docker_image.sh --interactive
+root@5e95f02cc3b0:/# /this_dir/inside_docker/zephyr_gdb.sh
+(gdb) source /this_dir/inside_docker/debug_naughty.py
+(gdb) info threads
+(gdb) thread apply all bt 1 full
+(gdb) thread 2
+(gdb) stackfold
+
+
+
+
+https://sourceware.org/gdb/onlinedocs/gdb/Basic-Python.html
+
+        Function: gdb.rbreak (regex [, minsyms [, throttle, [, symtabs ]]])
+        Return a Python list holding a collection of newly set gdb.Breakpoint objects matching function names defined by the regex pattern.
+        If the minsyms keyword is True, all system functions (those not explicitly defined in the inferior) will also be included in the match.
+        The throttle keyword takes an integer that defines the maximum number of pattern matches for functions matched by the regex pattern.
+        If the number of matches exceeds the integer value of throttle, a RuntimeError will be raised and no breakpoints will be created.
+        If throttle is not defined then there is no imposed limit on the maximum number of matches and breakpoints to be created.
+        The symtabs keyword takes a Python iterable that yields a collection of gdb.Symtab objects and will restrict the search to those functions only contained within the gdb.Symtab objects.
+
+
+
+gdb.execute('rbreak {:s}'.format(regexp))
+breakpoints = gdb.breakpoints()
+
+# Extract breakpoint strings, delete existing breakpoints, and
+# recreate them using my subclass.
+for bp in breakpoints:
+    loc = bp.location
+    bp.delete()
+    MyBreakpoint(loc)
+
+---
+
+
+https://github.com/BabbleSim/manifest.git
+
+apt-get install -y openssh-client
+
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+git config --global color.ui false
+
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+mkdir ~/bsim/ && cd ~/bsim/
+repo init -u git@github.com:BabbleSim/manifest.git -m everything.xml -b master
+repo sync
+
+
+--
+
+cd /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/
+
+rm -rf components/ext_libCryptov1
+
+apt-get install -y libfftw3-dev libfftw3-3
+
+--
+
+(cd /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_NRF52_hw_models && /usr/bin/gcc.real -g -ggdb -g -Wall -pedantic -MMD -MP -std=c11 -I/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/libUtilv1/src/ -I/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/libPhyComv1/src/ -I/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_2G4_libPhyComv1/src -I/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/libRandv2/src/ -Isrc/HW_models/ -fdata-sections -ffunction-sections -c src/nrfx/hal/nrf_timer.c -o /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_NRF52_hw_models/src/nrfx/hal/nrf_timer.o)
+make[1]: Leaving directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_NRF52_hw_models'
+make[1]: Entering directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1'
+make[2]: Entering directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1'
+Seems this is the first time you compile this BabbleSim with this libCrypto component (or the component has been updated), it will be compiled now (expect 1 minute)
+Unpacking source files...
+Compiling...
+This is silent on purpose... (if you have some problem compiling it, run these by hand:
+cd /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1/source-1.0.2g && setarch i386 ./config -m32 -g -fPIC >& /dev/null && make MAKEFLAGS= depend &> /dev/null && make MAKEFLAGS= build_libcrypto &> /dev/null
+make[2]: *** [Makefile.library:27: /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1/source-1.0.2g/libcrypto.a] Error 1
+make[2]: Leaving directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1'
+make[1]: *** [Makefile:23: /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1/libcrypto.a] Error 2
+make[1]: Leaving directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1'
+*** NOTE: ext_libCryptov1 could NOT be built, continuing ***
+make[1]: Entering directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_zephyr_app_builder'
+make[1]: Nothing to be done for 'default'.
+make[1]: Leaving directory '/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_zephyr_app_builder'
+
+
+(mips-stretch)root@429d1a08c0f4:/docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim# (cd /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1/source-1.0.2g && ./config -m32 -g -fPIC && make MAKEFLAGS= depend  && make MAKEFLAGS= build_libcrypto )
+
+
+sed -i 's/setarch i386 //g' components/ext_libCryptov1/Makefile.library
+
+(cd /docker_root/this_dir/inside_docker/inside_chroots/workspace/bsim/components/ext_libCryptov1/source-1.0.2g && ./config -m32 -g -fPIC && make MAKEFLAGS= depend   && make MAKEFLAGS= build_libcrypto )
